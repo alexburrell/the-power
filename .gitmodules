@@ -1,3 +1,6 @@
 [submodule "wemo"]
 	path = wemo
 	url = https://github.com/snosrap/wemo.git
+[submodule "pynest"]
+	path = pynest
+	url = https://github.com/alexburrell/pynest.git
