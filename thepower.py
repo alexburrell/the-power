@@ -6,7 +6,7 @@ import cherrypy
 import pystache
 import json
 from wemo.wemo import *
-from nest.nest import *
+from pynest.nest import *
 
 
 wemos = []
