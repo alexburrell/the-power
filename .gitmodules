@@ -1,0 +1,3 @@
+[submodule "wemo"]
+	path = wemo
+	url = https://github.com/snosrap/wemo.git
