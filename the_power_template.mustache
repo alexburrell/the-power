@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width" />
+
+		<title>The Power</title>
+
+		<link href='http://fonts.googleapis.com/css?family=Denk+One' rel='stylesheet' type='text/css'>
+		<link href='http://fonts.googleapis.com/css?family=Antic+Slab' rel='stylesheet' type='text/css'>
+		<style>
+		body {
+		    margin: 0;
+		    background: #F9F9F9;
+		    font-family: 'Denk One', sans-serif;
+		}
+
+		a {
+		    color: #000;
+		    text-decoration: none;
+		}
+
+		.title {
+		    font-size: 16px;
+		    padding: 5px 10px;
+		    margin: 0;
+		    border-bottom: solid 1px;
+		    text-shadow: 1px 1px 1px #CCC;
+		}
+
+		@media only screen 
+		and (min-device-width : 320px) 
+		and (max-device-width : 568px) {
+		    .title {
+		        text-align: center;
+		    }
+		}
+
+		.nest {
+		    border-top: solid 1px #CCC;
+		    border-bottom: solid 1px;
+		    padding: 10px;
+		}
+
+		.nest .controls .change-temp,
+		.nest .controls .temp {
+		    display: inline-block;
+		    vertical-align: middle;
+		    text-align: center;
+		}
+
+		.nest .controls .temp {
+		    margin: 0 5px;
+		}
+
+		.nest .controls .temp.cool {
+		    color: #438FE6;
+		}
+
+		.nest .controls .temp.heat {
+		    color: #CF3943;
+		}
+
+		.nest .controls .change-temp a {
+		    display: inline-block;
+		    background: -webkit-linear-gradient(#438FE6, #396BA3);
+		    height: 25px;
+		    width: 25px;
+		    border-radius: 15px;
+		    font-size: 10px;
+		    line-height: 25px;
+		}
+
+		.nest .controls .change-temp.lower a {
+		    -webkit-transform: rotate(180deg);
+		    background: -webkit-linear-gradient(#396BA3, #438FE6);
+		}
+
+		.nest .controls .change-temp a {
+		    color: #FFF;
+		}
+
+		.nest .name,
+		.nest .controls {
+		    display: inline-block;
+		}
+
+		.nest .name,
+		.wemo-buttons .name {
+		    width: 100px;
+		    font-family: 'Antic Slab', serif;
+		}
+
+		.nest .controls,
+		.wemo-buttons .controls {
+		    text-align: right;
+		    width: 195px;
+		}
+
+		.wemo-buttons {
+		    padding: 0;
+		    margin: 0;
+		}
+
+		.wemo-buttons li {
+		    list-style: none;
+		    padding: 10px;
+		    margin: 0;
+		    border-top: solid 1px #CCC;
+		    border-bottom: solid 1px;
+		}
+
+		.wemo-buttons .name,
+		.wemo-buttons .controls {
+		    display: inline-block;
+		}
+
+		.wemo-buttons .button {
+		    text-decoration: none;
+		    height: 35px;
+		    width: 35px;
+		}
+
+		.wemo-buttons .button span {
+		    display: inline-block;
+		    line-height: 35px;
+		    height: 35px;
+		    width: 35px;
+		    text-align: center;
+		    border-radius: 10px;
+		    color: #CCC;
+		}
+
+		.wemo-buttons .button.on .on {
+		    background: -webkit-linear-gradient(#5EA16A, #287135);
+		    color: #FFF;
+		}
+
+		.wemo-buttons .button.off .off {
+		    background: -webkit-linear-gradient(#CF3943, #9F353C);
+		    color: #FFF;
+		}
+
+		.wemo-buttons .button .on {}
+
+		.wemo-buttons .button .off {}
+
+		.footer {
+		    border-top: solid 1px #CCC;
+		}
+		</style>
+	</head>
+	<body>
+		<h1 class="title">THE POWER</h1>
+
+		<div class="nest">
+			{{#nest}}
+			<div class="name">Temperature:</div>
+			<div class="controls">
+				<span class="change-temp lower"><a class="button" href="change_temp/lower">&#x25B2;</a></span>
+				<span class="temp {{method}}">
+					<span class="cur-temp">{{{curtemp}}}</span> &rarr; <span class="target-temp">{{{targettemp}}}</span>
+				</span>
+				<span class="change-temp higher"><a class="button" href="change_temp/higher">&#x25B2;</a></span>
+			</div>
+			{{/nest}}
+		</div>
+
+		<ul class="wemo-buttons">
+		{{#wemo_buttons}}
+			<li class="{{classname}}">
+				<span class="name">{{name}}:</span>
+				<span class="controls">
+					<a href="{{href}}" class="button {{state}}">
+						<span class="off">OFF</span>
+						<span class="on">ON</span>
+					</a>
+				</span>
+			</li>
+		{{/wemo_buttons}}
+		</ul>
+
+		<div class="footer"></div>
+
+		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+		<script>
+		$(document).ready(function() {
+			$('.button').bind('click', function(event) {
+				event.preventDefault();
+
+				var href = $(this).attr('href'),
+					clicked = $(this);
+				$.ajax({
+					url: href
+				}).done(function(data) {
+					if (data.state) {
+						var remove = 'on';
+						if (data.state === 'on') remove = 'off';
+						clicked.removeClass(remove).addClass(data.state);
+					} else if (data.newTemp) {
+						$('.cur-temp').html(data['curTemp']);
+						$('.target-temp').html(data['newTemp']);
+					}
+				});
+			});
+
+			var update = function() {
+				$.ajax({
+					url: 'update'
+				}).done(function(data) {
+					$('.cur-temp').html(data['nest']['curtemp']);
+					$('.target-temp').html(data['nest']['targettemp']);
+					$('.temp').removeClass('heat').removeClass('cool').addClass(data['nest']['method']);
+
+					$.each(data['wemo'], function(index, item) {
+						$('.' + item['classname'] + ' .button').removeClass('off').removeClass('on').addClass(item['state']);
+					});
+				});
+			};
+
+			setInterval(update, 10000);
+		});
+		</script>
+	</body>
+</html>
