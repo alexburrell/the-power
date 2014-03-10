@@ -13,8 +13,6 @@ from secrets import Secrets
 secrets = Secrets()
 wemos = []
 wemo_dict = {}
-print secrets.username
-print secrets.password
 nest = Nest(username=secrets.username, password=secrets.password)
 nest.login()
 nest_curtemp = 0
