@@ -7,11 +7,15 @@ import pystache
 import json
 from wemo.wemo import *
 from pynest.nest import *
+from secrets import Secrets
 
 
+secrets = Secrets()
 wemos = []
 wemo_dict = {}
-nest = Nest(username='peterhajas@gmail.com', password='byHwxFbJbrB3tRNCxG3e')
+print secrets.username
+print secrets.password
+nest = Nest(username=secrets.username, password=secrets.password)
 nest.login()
 nest_curtemp = 0
 nest_targettemp = 0
